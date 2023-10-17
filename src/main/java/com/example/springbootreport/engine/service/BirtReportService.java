@@ -1,7 +1,6 @@
 package com.example.springbootreport.engine.service;
 
 import com.example.springbootreport.engine.dto.OutputType;
-import com.example.springbootreport.engine.dto.Report;
 import org.eclipse.birt.core.exception.BirtException;
 import org.eclipse.birt.core.framework.Platform;
 import org.eclipse.birt.report.engine.api.*;
@@ -59,67 +58,44 @@ public class BirtReportService implements DisposableBean {
         }
     }
 
-    private Report.ParameterType getParameterType(IParameterDefn param) {
-        if (IParameterDefn.TYPE_INTEGER == param.getDataType()) {
-            return Report.ParameterType.INT;
-        }
-        return Report.ParameterType.STRING;
+    public void generateMainReport(String reportName, OutputType type, HttpServletResponse response, HttpServletRequest request) {
+        response.setContentType(birtEngine.getMIMEType(type.name()));
+        RenderOption renderOption = getRenderOption(type);
+        generateReport(reports.get(reportName), response, request, renderOption);
     }
 
-    public void generateMainReport(String reportName, OutputType output, HttpServletResponse response, HttpServletRequest request) {
-        switch (output) {
-        case HTML:
-            generateHTMLReport(reports.get(reportName), response, request);
-            break;
-        case PDF:
-            generatePDFReport(reports.get(reportName), response, request);
-            break;
-        default:
-            throw new IllegalArgumentException("Output type not recognized:" + output);
+    private RenderOption getRenderOption(OutputType type) {
+        IRenderOption iOptions = new RenderOption();
+        iOptions.setOutputFormat(type.name());
+        RenderOption option;
+        switch (type) {
+            case html:
+                option = new HTMLRenderOption(iOptions);
+                ((HTMLRenderOption) option).setBaseImageURL(imageFolder);
+                ((HTMLRenderOption) option).setImageDirectory(imageFolder);
+                option.setImageHandler(htmlImageHandler);
+                break;
+            case pdf:
+                option = new PDFRenderOption(iOptions);
+                break;
+            case docx:
+                option = new DocxRenderOption();
+                option.setOutputFormat(type.name());
+                break;
+            case xlsx:
+                option = new EXCELRenderOption(iOptions);
+                break;
+            default:
+                throw new IllegalArgumentException("Output type not recognized:" + type);
         }
+        return option;
     }
-
-    /**
-     * Generate a report as HTML
-     */
-    @SuppressWarnings("unchecked")
-    private void generateHTMLReport(IReportRunnable report, HttpServletResponse response, HttpServletRequest request) {
+    private void generateReport(IReportRunnable report, HttpServletResponse response, HttpServletRequest request, RenderOption renderOption) {
         IRunAndRenderTask runAndRenderTask = birtEngine.createRunAndRenderTask(report);
-        response.setContentType(birtEngine.getMIMEType("html"));
-        IRenderOption options = new RenderOption();
-        HTMLRenderOption htmlOptions = new HTMLRenderOption(options);
-        htmlOptions.setOutputFormat("html");
-        htmlOptions.setBaseImageURL(imageFolder);
-        htmlOptions.setImageDirectory(imageFolder);
-        htmlOptions.setImageHandler(htmlImageHandler);
-        runAndRenderTask.setRenderOption(htmlOptions);
-        runAndRenderTask.getAppContext().put(EngineConstants.APPCONTEXT_BIRT_VIEWER_HTTPSERVET_REQUEST, request);
-
-        try {
-            htmlOptions.setOutputStream(response.getOutputStream());
-            runAndRenderTask.run();
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        } finally {
-            runAndRenderTask.close();
-        }
-    }
-
-    /**
-     * Generate a report as PDF
-     */
-    @SuppressWarnings("unchecked")
-    private void generatePDFReport(IReportRunnable report, HttpServletResponse response, HttpServletRequest request) {
-        IRunAndRenderTask runAndRenderTask = birtEngine.createRunAndRenderTask(report);
-        response.setContentType(birtEngine.getMIMEType("pdf"));
-        IRenderOption options = new RenderOption();
-        PDFRenderOption pdfRenderOption = new PDFRenderOption(options);
-        pdfRenderOption.setOutputFormat("pdf");
-        runAndRenderTask.setRenderOption(pdfRenderOption);
+        runAndRenderTask.setRenderOption(renderOption);
         runAndRenderTask.getAppContext().put(EngineConstants.APPCONTEXT_PDF_RENDER_CONTEXT, request);
-
         try {
-            pdfRenderOption.setOutputStream(response.getOutputStream());
+            renderOption.setOutputStream(response.getOutputStream());
             runAndRenderTask.run();
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
