@@ -32,9 +32,9 @@ spring:
       indent-output: true
   datasource:
 #    type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:oracle:thin:@125.212.214.195:3104:ORCLCDB
-    username: sacom_aml
-    password: 123456
+    url: jdbc:postgresql://localhost:5432/realshit?schema=public
+    username: postgres
+    password: postgres
     hikari:
       poolName: Hikari
       auto-commit: false

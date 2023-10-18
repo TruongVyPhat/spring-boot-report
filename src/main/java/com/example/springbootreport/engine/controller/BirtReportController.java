@@ -20,7 +20,7 @@ public class BirtReportController {
         this.reportService = reportService;
     }
 
-    @RequestMapping(produces = "application/json", method = RequestMethod.GET, value = "/report/reload")
+    @RequestMapping(produces = "application/json", method = RequestMethod.GET, value = "/reload")
     @ResponseBody
     public ResponseEntity<Void> reloadReports(HttpServletResponse response) {
         try {
@@ -31,7 +31,7 @@ public class BirtReportController {
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(produces = "text/html", method = RequestMethod.GET)
+    @RequestMapping(produces = "application/json", method = RequestMethod.GET)
     public ResponseEntity<Void> generateFullReport(
             HttpServletResponse response, HttpServletRequest request,
             @RequestParam("name") String name, @RequestParam("output") OutputType output
