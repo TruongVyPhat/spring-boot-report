@@ -3,6 +3,7 @@ package com.example.springbootreport.engine.controller;
 import com.example.springbootreport.engine.dto.OutputType;
 import com.example.springbootreport.engine.service.BirtReportService;
 import org.eclipse.birt.report.engine.api.EngineException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping("/api/report")
 public class BirtReportController {
 
+    @Autowired
     private final BirtReportService reportService;
 
     public BirtReportController(BirtReportService reportService) {

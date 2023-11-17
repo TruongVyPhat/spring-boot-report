@@ -21,6 +21,8 @@ logging:
     com.hipt.maven_birt_demo: DEBUG
 
 spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
   devtools:
     restart:
       enabled: true
@@ -32,9 +34,14 @@ spring:
       indent-output: true
   datasource:
 #    type: com.zaxxer.hikari.HikariDataSource
+#    url: jdbc:oracle:thin:@113.160.48.101:3104:ORCLCDB
+#    username: HCM_AML_USR
+#    password: hcmamlusr
+    driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/realshit?schema=public
     username: postgres
     password: postgres
+    jndi-name: jdbc/AMLDS_ITP
     hikari:
       poolName: Hikari
       auto-commit: false

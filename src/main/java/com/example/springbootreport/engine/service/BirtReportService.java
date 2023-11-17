@@ -4,6 +4,7 @@ import com.example.springbootreport.engine.dto.OutputType;
 import org.eclipse.birt.core.exception.BirtException;
 import org.eclipse.birt.core.framework.Platform;
 import org.eclipse.birt.report.engine.api.*;
+import org.eclipse.birt.report.model.api.OdaDataSourceHandle;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -55,6 +56,15 @@ public class BirtReportService implements DisposableBean {
             reports.put(file.replace(RPT_DESIGN_SUFFIX, ""),
                     birtEngine.openReportDesign(folder.getAbsolutePath() + File.separator + file));
 
+//            OdaDataSourceHandle dsHandle = config.newOdaDataSource(
+//                    "Data Source", "org.eclipse.birt.report.data.oda.jdbc" );
+//            dsHandle.setProperty( "odaDriverClass",
+//                    "oracle.jdbc.driver.OracleDriver" );
+//            dsHandle.setProperty( "odaURL", "jdbc:oracle:thin:@xeon:1521:ora9i" );
+//            dsHandle.setProperty( "odaUser", "AIMS_GTMNE" );
+//            dsHandle.setProperty( "odaPassword", "AIMS_GTMNE" );
+//
+//            designHandle.getDataSources( ).add( dsHandle );
         }
     }
 

@@ -11,16 +11,22 @@
     <groupId>com.example</groupId>
     <artifactId>spring-boot-report</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>war</packaging>
     <name>spring-boot-report</name>
     <description>spring-boot-report</description>
     <properties>
         <java.version>11</java.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
+        <local.datasource>java:/jdbc/ITPDataSource</local.datasource>
+        <local.datasource.username>HCM_AML_USR</local.datasource.username>
+        <local.datasource.password>hcmamlusr</local.datasource.password>
+        <local.datasource.url>jdbc:oracle:thin:@113.160.48.101:3104:ORCLCDB</local.datasource.url>
+<!--        <local.was.type>WebContent/WEB-INF/web.xml</local.was.type>-->
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
         <dependency>
@@ -28,10 +34,6 @@
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.oracle.database.jdbc</groupId>
-            <artifactId>ojdbc8</artifactId>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -64,20 +66,97 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <scope>provided</scope>
         </dependency>
-    </dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <version>2.5.0</version>
+        </dependency>
 
+    </dependencies>
     <build>
+        <finalName>Birt</finalName>
+        <sourceDirectory>${basedir}/src</sourceDirectory>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.tomcat.maven</groupId>
+                    <artifactId>tomcat7-maven-plugin</artifactId>
+                    <version>2.2</version>
+                    <configuration>
+                        <port>8080</port>
+                        <path>/</path>
+                        <serverXml>${project.build.directory}/config/server.xml</serverXml>
+                        <tomcatUsers>${project.build.directory}/config/tomcat-users.xml</tomcatUsers>
+                        <systemProperties>
+                            <MAVEN_OPTS>-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8080 -Dorg.apache.commons.logging.LogFactory=org.apache.commons.logging.impl.LogFactoryImpl</MAVEN_OPTS>
+                        </systemProperties>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven-resources-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/</directory>
+                                    <includes>
+                                        <!--                                        <include>META-INF/**</include>-->
+                                        <!--                                        <include>version.txt</include>-->
+                                        <include>**/*.*</include>
+                                    </includes>
+                                    <excludes>
+                                        <exclude>
+                                            **/*.java
+                                        </exclude>
+                                    </excludes>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-tomcat-conf</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/config</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/config/</directory>
+                                    <includes>
+                                        <include>**/*.*</include>
+                                    </includes>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
