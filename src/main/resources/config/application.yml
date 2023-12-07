@@ -15,12 +15,17 @@
 
 logging:
   level:
-    ROOT: DEBUG
+    ROOT: INFO
     tech.jhipster: DEBUG
     org.hibernate.SQL: DEBUG
     com.hipt.maven_birt_demo: DEBUG
+    org:
+      eclipse:
+        birt: DEBUG
 
 spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
   devtools:
     restart:
       enabled: true
@@ -54,6 +59,14 @@ spring:
 
 server:
   port: 8080
+
+reports:
+  relative:
+    path: reports/
+
+images:
+  relative:
+    path: images/
 
 # ===================================================================
 # JHipster specific properties
