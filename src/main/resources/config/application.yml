@@ -36,10 +36,11 @@ spring:
     serialization:
       indent-output: true
   datasource:
-#    type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/realshit?schema=public
-    username: postgres
-    password: postgres
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@113.160.48.101:3104:ORCLCDB
+    username: HCM_AML_USR
+    password: hcmamlusr
+    jndi-name: jdbc/jndiDataSource
     hikari:
       poolName: Hikari
       auto-commit: false

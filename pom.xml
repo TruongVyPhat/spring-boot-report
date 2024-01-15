@@ -14,15 +14,14 @@
     <name>spring-boot-report</name>
     <description>spring-boot-report</description>
     <properties>
-        <java.version>11</java.version>
+        <java.version>8</java.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -32,10 +31,6 @@
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc8</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -54,13 +49,12 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-<!--            <version>3.1.0</version>-->
+            <version>3.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.innoventsolutions.birt.runtime</groupId>
             <artifactId>org.eclipse.birt.runtime_4.8.0-20180626</artifactId>
             <version>4.8.0</version>
-<!--            <version>4.4.2</version>-->
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -70,6 +64,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <!-- https://github.com/apache/shardingsphere/issues/16116 -->
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-dbcp</artifactId>
+            <version>10.0.16</version>
         </dependency>
     </dependencies>
 
