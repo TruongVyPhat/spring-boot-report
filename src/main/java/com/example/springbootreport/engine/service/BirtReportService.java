@@ -5,40 +5,39 @@ import org.eclipse.birt.core.exception.BirtException;
 import org.eclipse.birt.core.framework.Platform;
 import org.eclipse.birt.report.engine.api.*;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
+import java.io.*;
 import java.util.*;
 
 @Service
 public class BirtReportService implements DisposableBean {
-    @Value("${reports.relative.path}")
-    private String reportsPath;
-    @Value("${images.relative.path}")
-    private String imagesPath;
-
-    private final HTMLServerImageHandler htmlImageHandler = new HTMLServerImageHandler();
 
     private IReportEngine birtEngine;
-    private String imageFolder;
 
-    private final Map<String, IReportRunnable> reports = new HashMap<>();
+    private final Map<String, IReportRunnable> reports = new HashMap() {{
+        put("AML_REPORT_CTR_001_en", null);
+        put("AML_REPORT_SacomBank_002_en", null);
+        put("AML_REPORT_SacomBank_003_en", null);
+        put("AML_REPORT_SacomBank_STR_001_en", null);
+        put("AML_REPORT_SacomBank_STR_002_en", null);
+        put("AML_REPORT_SacomBank_STR_002_limited_en", null);
+        put("AML_REPORT_STR_001_en", null);
+    }};
 
     private static final String RPT_DESIGN_SUFFIX = ".rptdesign";
 
     @SuppressWarnings("unchecked")
     @PostConstruct
-    protected void initialize() throws BirtException {
+    protected void initialize() throws BirtException, IOException {
         EngineConfig config = new EngineConfig();
         Platform.startup(config);
         IReportEngineFactory factory = (IReportEngineFactory) Platform
           .createFactoryObject(IReportEngineFactory.EXTENSION_REPORT_ENGINE_FACTORY);
         birtEngine = factory.createReportEngine(config);
-        imageFolder = System.getProperty("user.dir") + File.separatorChar + reportsPath + imagesPath;
         loadReports();
     }
 
@@ -46,15 +45,23 @@ public class BirtReportService implements DisposableBean {
      * Load report files to memory
      *
      */
-    public void loadReports() throws EngineException {
-        File folder = new File(reportsPath);
-        for (String file : Objects.requireNonNull(folder.list())) {
-            if (!file.endsWith(RPT_DESIGN_SUFFIX))
-                continue;
+    public void loadReports() throws EngineException, IOException {
+        String templatePath;
+        IReportRunnable report;
+        InputStream templateStream = null;
 
-            reports.put(file.replace(RPT_DESIGN_SUFFIX, ""),
-                    birtEngine.openReportDesign(folder.getAbsolutePath() + File.separator + file));
+        try {
+            for (String templateName: reports.keySet()) {
+                templatePath = "/reports/" + templateName + RPT_DESIGN_SUFFIX;
+                templateStream = getClass().getResourceAsStream(templatePath);
 
+                report = birtEngine.openReportDesign(templateStream);
+                // ... process the template here ...
+                reports.put(templateName, report);
+            }
+        } finally {
+            if (templateStream != null)
+                templateStream.close();
         }
     }
 
@@ -69,12 +76,6 @@ public class BirtReportService implements DisposableBean {
         iOptions.setOutputFormat(type.name());
         RenderOption option;
         switch (type) {
-            case html:
-                option = new HTMLRenderOption(iOptions);
-                ((HTMLRenderOption) option).setBaseImageURL(imageFolder);
-                ((HTMLRenderOption) option).setImageDirectory(imageFolder);
-                option.setImageHandler(htmlImageHandler);
-                break;
             case pdf:
                 option = new PDFRenderOption(iOptions);
                 break;

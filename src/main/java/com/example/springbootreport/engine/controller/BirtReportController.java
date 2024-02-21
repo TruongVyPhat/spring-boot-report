@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
-@Controller
+@RestController
 @RequestMapping("/api/report")
 public class BirtReportController {
 
@@ -25,7 +26,7 @@ public class BirtReportController {
     public ResponseEntity<Void> reloadReports(HttpServletResponse response) {
         try {
             reportService.loadReports();
-        } catch (EngineException e) {
+        } catch (EngineException | IOException e) {
             return ResponseEntity.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).build();
         }
         return ResponseEntity.ok().build();
